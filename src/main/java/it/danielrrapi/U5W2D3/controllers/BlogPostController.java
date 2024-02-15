@@ -3,6 +3,7 @@ package it.danielrrapi.U5W2D3.controllers;
 import it.danielrrapi.U5W2D3.entities.BlogPost;
 import it.danielrrapi.U5W2D3.servicies.BlogPostService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,8 +15,11 @@ public class BlogPostController {
     private BlogPostService blogPostService;
 
     @GetMapping
-    public List<BlogPost> getAllBlogPosts() {
-        return this.blogPostService.getBlogPosts();
+    public Page<BlogPost> getAllBlogPosts(@RequestParam(defaultValue = "0") int page,
+                                          @RequestParam(defaultValue = "10") int size,
+                                          @RequestParam(defaultValue = "id") String orderBy
+                                          ) {
+        return this.blogPostService.getBlogPosts(page, size, orderBy);
     }
 
     @GetMapping("/{id}")

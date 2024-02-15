@@ -2,6 +2,12 @@ package it.danielrrapi.U5W2D3.servicies;
 
 import it.danielrrapi.U5W2D3.entities.Author;
 import it.danielrrapi.U5W2D3.exceptions.NotFoundException;
+import it.danielrrapi.U5W2D3.repositories.AuthorDAO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -11,47 +17,30 @@ import java.util.Random;
 
 @Service
 public class AuthorService {
-    private List<Author> authors = new ArrayList<>();
+@Autowired
+private AuthorDAO authorDAO;
 
-    public List<Author> getAuthors() {
-        return authors;
+    public Page<Author> getAuthors(int pageNumber, int size, String orderBy) {
+        if(size > 100) size = 100;
+        Pageable pageable = PageRequest.of(pageNumber, size, Sort.by(orderBy));
+        return authorDAO.findAll(pageable);
     }
     public Author saveAuthor(Author newUser) {
-        Random random = new Random();
-        newUser.setId(random.nextInt(1, 1000000));
-        this.authors.add(newUser);
-        return newUser;
+       return authorDAO.save(newUser);
     }
     public Author findById(int id) {
-        Author found = null;
-        for (Author author : this.authors) {
-            if (author.getId() == id) {
-                found = author;
-            }
-        }
-        if (found == null) {
-            throw  new NotFoundException(id);
-        } else  return found;
+        return authorDAO.findById(id).orElseThrow(() -> new NotFoundException(id));
     }
-    public void findByIdAndUpdate(int id, Author updateUser) {
-        Iterator<Author> iterator = this.authors.iterator();
-        while (iterator.hasNext()) {
-            Author current = iterator.next();
-            if (current.getId() == id) {
-                current.setNome(updateUser.getNome());
-                current.setCognome(updateUser.getCognome());
-                current.setEmail(updateUser.getEmail());
-                current.setDataDiNascita(updateUser.getDataDiNascita());
-            }
-        }
+    public Author findByIdAndUpdate(int id, Author updateUser) {
+        Author found = this.findById(id);
+        found.setNome(updateUser.getNome());
+        found.setCognome(updateUser.getCognome());
+        found.setEmail(updateUser.getEmail());
+        found.setDataDiNascita(updateUser.getDataDiNascita());
+        return authorDAO.save(found);
     }
     public void findByIdAndDelete(int id) {
-        Iterator<Author> iterator = this.authors.iterator();
-        while (iterator.hasNext()) {
-            Author current = iterator.next();
-            if (current.getId() == id) {
-                iterator.remove();
-            }
-        }
+        Author found = this.findById(id);
+        authorDAO.delete(found);
     }
 }

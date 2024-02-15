@@ -1,6 +1,8 @@
 package it.danielrrapi.U5W2D3.entities;
 
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -8,11 +10,17 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @ToString
+@NoArgsConstructor
+@Entity
+@Table(name = "authors")
 public class Author {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String nome;
     private String cognome;
     private String email;
+    @Column(name = "data_di_nascita")
     private LocalDate dataDiNascita;
     private String avatar;
     public Author(long id, String nome, String cognome, String email, LocalDate dataDiNascita) {
